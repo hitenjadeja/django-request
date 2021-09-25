@@ -1,5 +1,7 @@
 from django.utils.deprecation import MiddlewareMixin
 
+from ipware import get_client_ip
+
 from . import settings
 from .models import Request
 from .router import Patterns
@@ -20,8 +22,9 @@ class RequestMiddleware(MiddlewareMixin):
 
         if request_is_ajax(request) and settings.IGNORE_AJAX:
             return response
-
-        if request.META.get('REMOTE_ADDR') in settings.IGNORE_IP:
+        
+        ip, is_routable = get_client_ip(request) if not None else ''
+        if ip in settings.IGNORE_IP:
             return response
 
         ignore = Patterns(False, *settings.IGNORE_USER_AGENTS)
