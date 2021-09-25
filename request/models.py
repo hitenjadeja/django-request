@@ -6,6 +6,8 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from ipware import get_client_ip
+
 from . import settings as request_settings
 from .managers import RequestManager
 from .utils import HTTP_STATUS_CODES, browsers, engines, request_is_ajax
@@ -59,7 +61,7 @@ class Request(models.Model):
         self.is_ajax = request_is_ajax(request)
 
         # User information.
-        self.ip = request.META.get('REMOTE_ADDR', '')
+        self.ip, is_routable = get_client_ip(request) if not None else ''
         self.referer = request.META.get('HTTP_REFERER', '')[:255]
         self.user_agent = request.META.get('HTTP_USER_AGENT', '')[:255]
         self.language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')[:255]
