@@ -1,3 +1,5 @@
+import logging
+
 from django.core.exceptions import ValidationError
 from django.utils.deprecation import MiddlewareMixin
 
@@ -7,6 +9,8 @@ from . import settings
 from .models import Request
 from .router import Patterns
 from .utils import request_is_ajax
+
+logger = logging.getLogger('request.security.middleware')
 
 
 class RequestMiddleware(MiddlewareMixin):
@@ -40,8 +44,13 @@ class RequestMiddleware(MiddlewareMixin):
         try:
             r.from_http_request(request, response, commit=False)
             r.full_clean()
-        except ValidationError:
-            pass
+        except ValidationError as exc:
+            logger.warning(
+                'Bad request: %s',
+                str(exc),
+                exc_info=exc,
+                extra={'status_code': 400, 'request': request},
+            )
         else:
             r.save()
         return response
