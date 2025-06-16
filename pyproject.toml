@@ -8,6 +8,7 @@ version = "1.7.0"
 dependencies = [
     "Django>=4.2",
     "python-dateutil",
+    "django-ipware>=2.0.1",
 ]
 description = "django-request is a statistics module for django. It stores requests in a database for admins to see, it can also be used to get statistics on who is online etc."
 readme = "README.rst"
